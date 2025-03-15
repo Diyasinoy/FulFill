@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Delivery Map Tracking</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            height: 100vh;
+        }
+
+        .sidebar {
+            background: #f5f5f5;
+            padding: 20px;
+            border-right: 1px solid #ddd;
+        }
+
+        .map-container {
+            width: 100%;
+            height: 100%;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .delivery-info {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+
+        p {
+            margin: 5px 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            background: #e3f2fd;
+            color: #1976d2;
+            margin-top: 5px;
+        }
+
+        .eta {
+            font-weight: bold;
+            color: #4caf50;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="delivery-info">
+                <h3>Current Delivery</h3>
+                <p><strong>Order:</strong> Fresh Food Package</p>
+                <p><strong>From:</strong> Central Kitchen</p>
+                <p><strong>To:</strong> City Food Bank</p>
+                <div class="status">In Transit</div>
+                <p class="eta">ETA: 15 minutes</p>
+            </div>
+        </div>
+        <div class="map-container">
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <script>
+        let map;
+        let markers = [];
+        let directionsService;
+        let directionsRenderer;
+
+        // Sample delivery coordinates (you can change these to your desired locations)
+        const delivery = {
+            pickup: { lat: 51.5074, lng: -0.1278 },    // London center
+            current: { lat: 51.5114, lng: -0.1348 },   // Current location
+            delivery: { lat: 51.5154, lng: -0.1418 }   // Destination
+        };
+
+        function initMap() {
+            // Initialize the map
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: delivery.current,
+                zoom: 13,
+                styles: [
+                    {
+                        featureType: "poi",
+                        elementType: "labels",
+                        stylers: [{ visibility: "off" }]
+                    }
+                ]
+            });
+
+            // Initialize the directions service and renderer
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer({
+                map: map,
+                suppressMarkers: true, // We'll add custom markers
+                polylineOptions: {
+                    strokeColor: '#4CAF50',
+                    strokeWeight: 5
+                }
+            });
+
+            // Add markers
+            addMarker(delivery.pickup, 'Pickup Location', 'http://maps.google.com/mapfiles/ms/icons/green-dot.png');
+            addMarker(delivery.current, 'Current Location', 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png');
+            addMarker(delivery.delivery, 'Delivery Location', 'http://maps.google.com/mapfiles/ms/icons/red-dot.png');
+
+            // Show route
+            showRoute();
+
+            // Simulate movement (optional)
+            simulateMovement();
+        }
+
+        function addMarker(position, title, icon) {
+            const marker = new google.maps.Marker({
+                position: position,
+                map: map,
+                title: title,
+                icon: {
+                    url: icon,
+                    scaledSize: new google.maps.Size(40, 40)
+                }
+            });
+            markers.push(marker);
+        }
+
+        function showRoute() {
+            const request = {
+                origin: delivery.pickup,
+                destination: delivery.delivery,
+                waypoints: [{
+                    location: delivery.current,
+                    stopover: true
+                }],
+                travelMode: 'DRIVING'
+            };
+
+            directionsService.route(request, (result, status) => {
+                if (status === 'OK') {
+                    directionsRenderer.setDirections(result);
+                    
+                    // Fit map to show all markers
+                    const bounds = new google.maps.LatLngBounds();
+                    bounds.extend(delivery.pickup);
+                    bounds.extend(delivery.current);
+                    bounds.extend(delivery.delivery);
+                    map.fitBounds(bounds);
+                }
+            });
+        }
+
+        function simulateMovement() {
+            // Simulate vehicle movement every 3 seconds
+            setInterval(() => {
+                // Move current location marker slightly
+                delivery.current.lat += 0.0001;
+                delivery.current.lng += 0.0001;
+                
+                // Update current location marker
+                markers[1].setPosition(delivery.current);
+                
+                // Update route
+                showRoute();
+                
+                // Update ETA
+                updateETA();
+            }, 3000);
+        }
+
+        function updateETA() {
+            const eta = document.querySelector('.eta');
+            const minutes = Math.floor(Math.random() * 5) + 10; // Random ETA between 10-15 minutes
+            eta.textContent = `ETA: ${minutes} minutes`;
+        }
+    </script>
+    <!-- Replace YOUR_API_KEY with a Google Maps API key if you have one -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async defer></script>
+</body>
+</html> 

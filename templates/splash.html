@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome - Food Waste Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .splash-container {
+            position: relative;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .splash-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .splash-slide.active {
+            opacity: 1;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+            text-align: center;
+        }
+
+        .title {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .loading {
+            width: 150px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .loading-bar {
+            width: 0;
+            height: 100%;
+            background: #4CAF50;
+            animation: loading 2s linear forwards;
+        }
+
+        @keyframes loading {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="splash-container">
+        <div class="splash-slide active">
+            <div class="overlay">
+                <h1 class="title">Food Waste Management</h1>
+                <p class="subtitle">Connecting Restaurants with NGOs</p>
+                <div class="loading">
+                    <div class="loading-bar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Array of background images
+        const images = [
+            "{{ url_for('static', filename='images/food1.jpg') }}",
+            "{{ url_for('static', filename='images/food2.jpg') }}",
+            "{{ url_for('static', filename='images/food3.jpg') }}"
+        ];
+
+        // Set random background image
+        const splash = document.querySelector('.splash-slide');
+        splash.style.backgroundImage = `url(${images[Math.floor(Math.random() * images.length)]})`;
+
+        // Redirect to login page after animation
+        setTimeout(() => {
+            window.location.href = "{{ url_for('login_page') }}";
+        }, 2000); // Redirect after 2 seconds
+    </script>
+</body>
+</html> 

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscribe - Food Waste Management</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .subscription-container {
+            margin-top: 80px;
+            padding: 2rem;
+            background: #f5f5f5;
+            min-height: calc(100vh - 80px);
+        }
+
+        .plans-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+        }
+
+        .plan-card {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .plan-name {
+            color: #333;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .plan-price {
+            font-size: 2.5rem;
+            color: #4CAF50;
+            margin-bottom: 1rem;
+        }
+
+        .plan-price span {
+            font-size: 1rem;
+            color: #666;
+        }
+
+        .plan-features {
+            list-style: none;
+            padding: 0;
+            margin: 2rem 0;
+        }
+
+        .plan-features li {
+            margin: 0.5rem 0;
+            color: #666;
+        }
+
+        .subscribe-btn {
+            background: #4CAF50;
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+
+        .subscribe-btn:hover {
+            background: #45a049;
+        }
+
+        .payment-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .payment-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .success-message {
+            display: none;
+            background: #dff0d8;
+            color: #3c763d;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+
+        .error-message {
+            display: none;
+            background: #f2dede;
+            color: #a94442;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+   
+    <div class="subscription-container">
+        <div class="plans-container">
+            <div class="plan-card">
+                <h3 class="plan-name">Basic Plan</h3>
+                <div class="plan-price">$9.99<span>/month</span></div>
+                <ul class="plan-features">
+                    <li>✓ Up to 50 food listings</li>
+                    <li>✓ Basic analytics</li>
+                    <li>✓ Email support</li>
+                    <li>✓ 1 user account</li>
+                </ul>
+                <button class="subscribe-btn" onclick="showPaymentModal('basic', 9.99, 'monthly')">Subscribe Now</button>
+            </div>
+
+            <div class="plan-card">
+                <h3 class="plan-name">Premium Plan</h3>
+                <div class="plan-price">$19.99<span>/month</span></div>
+                <ul class="plan-features">
+                    <li>✓ Unlimited food listings</li>
+                    <li>✓ Advanced analytics</li>
+                    <li>✓ Priority support</li>
+                    <li>✓ 5 user accounts</li>
+                </ul>
+                <button class="subscribe-btn" onclick="showPaymentModal('premium', 19.99, 'monthly')">Subscribe Now</button>
+            </div>
+
+            <div class="plan-card">
+                <h3 class="plan-name">Enterprise Plan</h3>
+                <div class="plan-price">$199.99<span>/year</span></div>
+                <ul class="plan-features">
+                    <li>✓ All Premium features</li>
+                    <li>✓ Custom solutions</li>
+                    <li>✓ 24/7 support</li>
+                    <li>✓ Unlimited users</li>
+                </ul>
+                <button class="subscribe-btn" onclick="showPaymentModal('enterprise', 199.99, 'yearly')">Subscribe Now</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="payment-modal" id="paymentModal">
+        <div class="payment-form">
+            <span class="close-modal" onclick="closePaymentModal()">&times;</span>
+            <h2>Payment Details</h2>
+            <div id="successMessage" class="success-message"></div>
+            <div id="errorMessage" class="error-message"></div>
+            <form id="paymentForm">
+                <div class="form-group">
+                    <label for="cardName">Name on Card</label>
+                    <input type="text" id="cardName" required>
+                </div>
+                <div class="form-group">
+                    <label for="cardNumber">Card Number</label>
+                    <input type="text" id="cardNumber" required pattern="[0-9]{16}">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="expiry">Expiry Date</label>
+                        <input type="text" id="expiry" placeholder="MM/YY" required pattern="[0-9]{2}/[0-9]{2}">
+                    </div>
+                    <div class="form-group">
+                        <label for="cvv">CVV</label>
+                        <input type="text" id="cvv" required pattern="[0-9]{3,4}">
+                    </div>
+                </div>
+                <button type="submit" class="subscribe-btn">Pay Now</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentPlan = null;
+
+        function showPaymentModal(plan, amount, interval) {
+            currentPlan = { plan, amount, interval };
+            document.getElementById('paymentModal').style.display = 'flex';
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        document.getElementById('paymentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                userId: localStorage.getItem('userId'), // Make sure you store this during login
+                plan_type: currentPlan.interval,
+                amount: currentPlan.amount,
+                payment_method: 'credit_card',
+                card_details: {
+                    name: document.getElementById('cardName').value,
+                    number: document.getElementById('cardNumber').value,
+                    expiry: document.getElementById('expiry').value,
+                    cvv: document.getElementById('cvv').value
+                }
+            };
+
+            try {
+                const response = await fetch('/subscribe', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('userToken')}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('userToken', data.token);
+                    localStorage.setItem('userId', data.user.id);
+                    document.getElementById('successMessage').textContent = 'Subscription successful!';
+                    document.getElementById('successMessage').style.display = 'block';
+                    document.getElementById('errorMessage').style.display = 'none';
+                    setTimeout(() => {
+                        closePaymentModal();
+                        window.location.href = '/home';
+                    }, 2000);
+                } else {
+                    document.getElementById('errorMessage').textContent = data.message || 'Subscription failed';
+                    document.getElementById('errorMessage').style.display = 'block';
+                    document.getElementById('successMessage').style.display = 'none';
+                }
+            } catch (error) {
+                document.getElementById('errorMessage').textContent = 'Server error. Please try again later.';
+                document.getElementById('errorMessage').style.display = 'block';
+                document.getElementById('successMessage').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html> 

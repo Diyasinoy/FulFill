@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Waste Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #45a049;
+            --accent-color: #ff6b6b;
+            --text-color: #333;
+            --light-gray: #f5f5f5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .btn-login {
+            background: var(--primary-color);
+            color: white !important;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+        }
+
+        .btn-login:hover {
+            background: var(--secondary-color);
+        }
+
+        .hero-section {
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url("{{ url_for('static', filename='images/food-bg.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 20px;
+            margin-top: 60px; /* Space for navbar */
+        }
+
+        .hero-content {
+            max-width: 800px;
+        }
+
+        .hero-title {
+            color: white;
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .hero-subtitle {
+            color: white;
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .donate-btn {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 1rem 2.5rem;
+            font-size: 1.2rem;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            border: 2px solid #4CAF50;
+            animation: fadeInUp 1.2s ease-out;
+        }
+
+        .donate-btn:hover {
+            background: transparent;
+            color: white;
+            border-color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stats-section {
+            padding: 4rem 0;
+            background: var(--light-gray);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            text-align: center;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .listings-section {
+            padding: 4rem 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .listings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .listing-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+
+        .listing-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .listing-image {
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .listing-content {
+            padding: 1.5rem;
+        }
+
+        .listing-content h3 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .listing-details {
+            list-style: none;
+            margin-bottom: 1rem;
+        }
+
+        .listing-details li {
+            margin-bottom: 0.5rem;
+            color: #666;
+        }
+
+        .btn-secondary {
+            background: var(--accent-color);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .btn-secondary:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        if (!checkAuth()) {
+            window.location.href = "{{ url_for('login_page') }}";
+        }
+    </script>
+
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <h1 class="logo">Food Waste Management</h1>
+                <ul class="nav-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#listings">Food Listings</a></li>
+                    <li><a href="#donate">Donate Food</a></li>
+                    <li><a href="{{ url_for('subscribe_page') }}">Subscribe</a></li>
+                    <li><a href="{{ url_for('tracking_page') }}">Track Delivery</a></li>
+                    <li><a href="#" onclick="logout()" class="btn-login">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">Reduce Food Waste, Help Those in Need</h1>
+            <p class="hero-subtitle">
+                Connect restaurants with NGOs to distribute surplus food and make a difference in your community
+            </p>
+            <a href="{{ url_for('donate_page') }}" class="donate-btn" onclick="startDonation(event)">Start Donating</a>
+        </div>
+    </section>
+
+    <section class="stats-section">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">5000+</div>
+                    <div class="stat-label">Meals Donated</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">100+</div>
+                    <div class="stat-label">Partner Restaurants</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">NGO Partners</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">1000+</div>
+                    <div class="stat-label">People Fed Daily</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="listings-section" id="listings">
+        <div class="container">
+            <div class="section-header">
+                <h2>Available Food Listings</h2>
+                <p>Browse through available food donations in your area</p>
+            </div>
+            <div class="listings-grid">
+                <div class="listing-card">
+                    <div class="listing-image" style="background-image: url('static/food1.jpg');"></div>
+                    <div class="listing-content">
+                        <h3>Fresh Vegetables</h3>
+                        <p>Assorted fresh vegetables from today's stock</p>
+                        <ul class="listing-details">
+                            <li>📦 Quantity: 10 kg</li>
+                            <li>⏰ Expiry: Today 8 PM</li>
+                            <li>📍 Location: Downtown Restaurant</li>
+                        </ul>
+                        <button class="btn-secondary">Reserve</button>
+                    </div>
+                </div>
+                <!-- Add more listing cards as needed -->
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function startDonation(event) {
+            event.preventDefault();
+            
+            // Check if user is authenticated
+            const token = localStorage.getItem('userToken');
+            if (!token) {
+                alert('Please login to donate food');
+                window.location.href = '/login';
+                return;
+            }
+
+            // If authenticated, redirect to donation page
+            window.location.href = '/donate';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Example: Animate stats numbers
+            const stats = document.querySelectorAll('.stat-number');
+            stats.forEach(stat => {
+                const target = parseInt(stat.textContent);
+                let count = 0;
+                const duration = 2000; // 2 seconds
+                const increment = target / (duration / 16);
+                
+                const timer = setInterval(() => {
+                    count += increment;
+                    if (count >= target) {
+                        stat.textContent = target + '+';
+                        clearInterval(timer);
+                    } else {
+                        stat.textContent = Math.floor(count) + '+';
+                    }
+                }, 16);
+            });
+        });
+    </script>
+</body>
+</html> 

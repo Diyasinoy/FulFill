@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donate Food - Food Waste Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .donate-container {
+            margin-top: 80px;
+            padding: 2rem;
+            background: #f5f5f5;
+            min-height: calc(100vh - 80px);
+        }
+
+        .donate-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .donate-header h1 {
+            color: #4CAF50;
+            margin-bottom: 0.5rem;
+        }
+
+        .donate-header p {
+            color: #666;
+        }
+
+        .donate-form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-section h3 {
+            color: #333;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #4CAF50;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #4CAF50;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
+        }
+
+        .submit-btn {
+            background: #4CAF50;
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1.1rem;
+            transition: background 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background: #45a049;
+        }
+
+        .success-message,
+        .error-message {
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .success-message {
+            background: #dff0d8;
+            color: #3c763d;
+            border: 1px solid #d6e9c6;
+        }
+
+        .error-message {
+            background: #f2dede;
+            color: #a94442;
+            border: 1px solid #ebccd1;
+        }
+    </style>
+</head>
+<body>
+   
+    <div class="donate-container">
+        <div class="donate-header">
+            <h1>Donate Food</h1>
+            <p>Help reduce food waste and support those in need</p>
+        </div>
+
+        <div class="donate-form-container">
+            <div id="successMessage" class="success-message"></div>
+            <div id="errorMessage" class="error-message"></div>
+            
+            <form id="donateForm">
+                <div class="form-section">
+                    <h3>Food Details</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="foodName">Food Item Name*</label>
+                            <input type="text" id="foodName" required placeholder="e.g., Fresh Vegetables">
+                        </div>
+                        <div class="form-group">
+                            <label for="quantity">Quantity*</label>
+                            <input type="number" id="quantity" required min="1" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label for="unit">Unit*</label>
+                            <select id="unit" required>
+                                <option value="">Select Unit</option>
+                                <option value="kg">Kilograms</option>
+                                <option value="items">Items</option>
+                                <option value="portions">Portions</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description*</label>
+                        <textarea id="description" rows="4" required placeholder="Provide details about the food items..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Pickup Details</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="expiryDate">Expiry Date & Time*</label>
+                            <input type="datetime-local" id="expiryDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="pickupTime">Preferred Pickup Time*</label>
+                            <input type="datetime-local" id="pickupTime" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Pickup Address*</label>
+                        <textarea id="address" rows="2" required placeholder="Enter complete pickup address..."></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">Submit Donation</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('donateForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                foodName: document.getElementById('foodName').value,
+                quantity: document.getElementById('quantity').value,
+                unit: document.getElementById('unit').value,
+                description: document.getElementById('description').value,
+                expiryDate: document.getElementById('expiryDate').value,
+                pickupTime: document.getElementById('pickupTime').value,
+                address: document.getElementById('address').value
+            };
+
+            try {
+                const response = await fetch('/api/donate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('userToken')}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('successMessage').textContent = 'Donation listed successfully!';
+                    document.getElementById('successMessage').style.display = 'block';
+                    document.getElementById('errorMessage').style.display = 'none';
+                    
+                    // Reset form
+                    document.getElementById('donateForm').reset();
+                    
+                    // Redirect after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = '/home';
+                    }, 2000);
+                } else {
+                    document.getElementById('errorMessage').textContent = data.message || 'Failed to submit donation. Please try again.';
+                    document.getElementById('errorMessage').style.display = 'block';
+                    document.getElementById('successMessage').style.display = 'none';
+                }
+            } catch (error) {
+                document.getElementById('errorMessage').textContent = 'Server error. Please try again later.';
+                document.getElementById('errorMessage').style.display = 'block';
+                document.getElementById('successMessage').style.display = 'none';
+            }
+        });
+
+        // Set minimum datetime for expiry and pickup time
+        const now = new Date();
+        const tzOffset = now.getTimezoneOffset() * 60000;
+        const localISOTime = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 16);
+        
+        document.getElementById('expiryDate').min = localISOTime;
+        document.getElementById('pickupTime').min = localISOTime;
+    </script>
+</body>
+</html> 
