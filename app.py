@@ -262,7 +262,9 @@ def donate():
         data = request.json
         user_id = get_jwt_identity()
         
+        app.logger.debug(f"Incoming donation data: {data}")  # Log incoming data
         new_listing = FoodListing(
+
             restaurant_id=user_id,
             food_name=data['foodName'],
             description=data['description'],
@@ -274,10 +276,14 @@ def donate():
         
         db.session.add(new_listing)
         db.session.commit()
+        app.logger.info("Donation listed successfully")  # Log success
+
         
         return jsonify({'message': 'Donation listed successfully'}), 201
     except Exception as e:
+        app.logger.error(f"Donation failed: {str(e)}")  # Log error
         return jsonify({'message': str(e)}), 500
+
 
 @app.route('/home')
 def home():
@@ -291,4 +297,4 @@ if __name__ == '__main__':
         except Exception as e:
             app.logger.error(f"Error creating database tables: {str(e)}")
     
-    app.run(debug=True, port=5000) 
+    app.run(debug=True, port=5000)

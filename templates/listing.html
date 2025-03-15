@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Donations</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h2>Available Food Donations</h2>
+    <table>
+        <tr>
+            <th>Donor Name</th>
+            <th>Food Type</th>
+            <th>Quantity</th>
+            <th>Location</th>
+        </tr>
+        {% for donation in donations %}
+        <tr>
+            <td>{{ donation.donor_name }}</td>
+            <td>{{ donation.food_type }}</td>
+            <td>{{ donation.quantity }}</td>
+            <td>{{ donation.location }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <a href="/donate">Donate More Food</a>
+</body>
+</html>
